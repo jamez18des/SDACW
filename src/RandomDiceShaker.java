@@ -5,6 +5,7 @@ public class RandomDiceShaker implements  DiceShaker{
 
     @Override
     public int shake() {
-        return random.nextInt(6) + 1;
+        return random.nextInt(6) + 1
+                + random.nextInt(6) + 1; // two dice summed;
     }
 }

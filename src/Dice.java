@@ -7,7 +7,7 @@ public class Dice {
     }
 
     public int roll() {
-        return shaker.shake() + shaker.shake();
+        return shaker.shake();
     }
 
 }
