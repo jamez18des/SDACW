@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class BasePlayer implements Player {
 
     private static final int HOME_INDEX = 0;

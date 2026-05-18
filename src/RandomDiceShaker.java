@@ -1,11 +1,20 @@
 import java.util.Random;
-public class RandomDiceShaker implements  DiceShaker{
+
+public class RandomDiceShaker implements DiceShaker {
 
     private static final Random random = new Random();
+    private final int numberOfDice;
+
+    public RandomDiceShaker(int numberOfDice) {
+        this.numberOfDice = numberOfDice;
+    }
 
     @Override
     public int shake() {
-        return random.nextInt(6) + 1
-                + random.nextInt(6) + 1; // two dice summed;
+        int total = 0;
+        for (int i = 0; i < numberOfDice; i++) {
+            total += random.nextInt(6) + 1;
+        }
+        return total;
     }
 }
