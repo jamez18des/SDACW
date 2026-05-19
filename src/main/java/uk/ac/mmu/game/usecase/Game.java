@@ -1,41 +1,43 @@
 package uk.ac.mmu.game.usecase;
+
 import uk.ac.mmu.game.domain.Board;
 import uk.ac.mmu.game.domain.Dice;
+import uk.ac.mmu.game.domain.Player;
 import uk.ac.mmu.game.domain.rules.HitRuleStrategy;
 import uk.ac.mmu.game.domain.rules.TeleportRuleStrategy;
-import uk.ac.mmu.game.infrastructure.player.BasePlayer;
 import uk.ac.mmu.game.usecase.port.GameOutputPort;
 
 import java.util.List;
 
 public class Game {
 
-    private final List<BasePlayer> players;
+    private final List<Player> players;
     private final Dice dice;
     private final Board board;
     private final HitRuleStrategy hitRule;
     private final TeleportRuleStrategy teleportRule;
+    private final GameOutputPort output;
 
-    public Game(List<BasePlayer> players, Dice dice, Board board,
+    public Game(List<Player> players, Dice dice, Board board,
                 HitRuleStrategy hitRule, TeleportRuleStrategy teleportRule, GameOutputPort output) {
         this.players = players;
         this.dice = dice;
         this.board = board;
         this.hitRule = hitRule;
         this.teleportRule = teleportRule;
+        this.output = output;
     }
 
     public void play() {
-        System.out.println("Board: rows=" + board.getRows()
-                + " columns=" + board.getColumns());
-        System.out.println("Players: " + players.size());
-        System.out.println();
-        for (BasePlayer p : players) {
-            System.out.println(p.getName() + " " + p.getTrackDescription());
+        output.printLine("Board: rows=" + board.getRows() + " columns=" + board.getColumns());
+        output.printLine("Players: " + players.size());
+        output.printBlankLine();
+        for (Player p : players) {
+            output.printLine(p.getName() + " " + p.getTrackDescription());
         }
-        System.out.println();
-        System.out.println("Game State: Ready -> InPlay");
-        System.out.println();
+        output.printBlankLine();
+        output.printLine("Game State: Ready -> InPlay");
+        output.printBlankLine();
 
         int[] turnCounts = new int[players.size()];
         int totalTurns = 0;
@@ -43,32 +45,25 @@ public class Game {
         outer:
         while (true) {
             for (int i = 0; i < players.size(); i++) {
-                BasePlayer current = players.get(i);
+                Player current = players.get(i);
                 turnCounts[i]++;
                 totalTurns++;
 
                 int roll = dice.roll();
-                String from = formatPosition(current.getPosition(),
-                        current.getHomePosition(), current.getEndPosition());
+                String from = formatPosition(current.getPosition(), current.getHomePosition(), current.getEndPosition());
                 int peek = current.peekPosition(roll);
 
-                System.out.println(current.getName() + " turn "
-                        + turnCounts[i] + " rolls " + roll);
-                System.out.println(current.getName() + " moves from " + from
-                        + " to " + formatPosition(peek,
-                        current.getHomePosition(), current.getEndPosition()));
+                output.printLine(current.getName() + " turn " + turnCounts[i] + " rolls " + roll);
+                output.printLine(current.getName() + " moves from " + from + " to " + formatPosition(peek, current.getHomePosition(), current.getEndPosition()));
 
-                BasePlayer hitTarget = findHit(current, peek);
+                Player hitTarget = findHit(current, peek);
 
                 if (hitTarget != null && peek != current.getEndPosition()) {
-                    System.out.println(current.getName() + " hit "
-                            + hitTarget.getName()
-                            + " at position Position " + peek);
+                    output.printLine(current.getName() + " hit " + hitTarget.getName() + " at position Position " + peek);
                     if (hitRule.allowMove(peek, hitTarget.getPosition())) {
                         current.advance(roll);
                     } else {
-                        System.out.println(current.getName() + " moves from "
-                                + peek + " to " + from);
+                        output.printLine(current.getName() + " moves from " + peek + " to " + from);
                     }
                 } else {
                     current.advance(roll);
@@ -77,27 +72,22 @@ public class Game {
                 if (!current.isAtEnd()) {
                     int teleported = teleportRule.applyRule(current.getPosition());
                     if (teleported != current.getPosition()) {
-                        System.out.println(current.getName()
-                                + " is teleported. " + current.getName()
-                                + " moves from " + current.getPosition()
-                                + " to " + teleported);
+                        output.printLine(current.getName() + " is teleported. " + current.getName() + " moves from " + current.getPosition() + " to " + teleported);
                         current.setPosition(teleported);
                     }
                 }
 
                 if (current.isAtEnd()) {
-                    System.out.println(current.getName() + " wins in "
-                            + turnCounts[i] + " turns. Total turns: "
-                            + totalTurns + ".");
-                    System.out.println("Game State: InPlay -> GameOver");
+                    output.printLine(current.getName() + " wins in " + turnCounts[i] + " turns. Total turns: " + totalTurns + ".");
+                    output.printLine("Game State: InPlay -> GameOver");
                     break outer;
                 }
             }
         }
     }
 
-    private BasePlayer findHit(BasePlayer current, int peekPos) {
-        for (BasePlayer other : players) {
+    private Player findHit(Player current, int peekPos) {
+        for (Player other : players) {
             if (other != current && other.getPosition() == peekPos) {
                 return other;
             }

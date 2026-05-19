@@ -2,7 +2,13 @@ package uk.ac.mmu.game.domain;
 public interface Player {
     String getName();
     int getPosition();
+    int peekPosition(int roll);
+    void advance(int roll);
+    void setPosition(int position);
     boolean isHome();
     boolean isAtEnd();
-    void advance(int steps);
+    int getHomePosition();
+    int getEndPosition();
+    String getTrackDescription();
+
 }
