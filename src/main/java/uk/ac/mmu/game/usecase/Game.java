@@ -27,7 +27,7 @@ public class Game {
         this.teleportRule = teleportRule;
         this.output = output;
     }
-
+    // Prints board info and player tracks before the game starts
     public void play() {
         output.printLine("Board: rows=" + board.getRows() + " columns=" + board.getColumns());
         output.printLine("Players: " + players.size());
@@ -41,14 +41,14 @@ public class Game {
 
         int[] turnCounts = new int[players.size()];
         int totalTurns = 0;
-
+        // Main game loop — continues until a player reaches the end
         outer:
         while (true) {
             for (int i = 0; i < players.size(); i++) {
                 Player current = players.get(i);
                 turnCounts[i]++;
                 totalTurns++;
-
+                // Roll dice and calculate where the player would land
                 int roll = dice.roll();
                 String from = formatPosition(current.getPosition(), current.getHomePosition(), current.getEndPosition());
                 int peek = current.peekPosition(roll);
@@ -56,8 +56,9 @@ public class Game {
                 output.printLine(current.getName() + " turn " + turnCounts[i] + " rolls " + roll);
                 output.printLine(current.getName() + " moves from " + from + " to " + formatPosition(peek, current.getHomePosition(), current.getEndPosition()));
 
+                // Check if landing position is occupied by another player
                 Player hitTarget = findHit(current, peek);
-
+                // Apply hit rule — either block move or allow it
                 if (hitTarget != null && peek != current.getEndPosition()) {
                     output.printLine(current.getName() + " hit " + hitTarget.getName() + " at position Position " + peek);
                     if (hitRule.allowMove(peek, hitTarget.getPosition())) {
@@ -68,6 +69,7 @@ public class Game {
                 } else {
                     current.advance(roll);
                 }
+                // Check for wormhole teleportation after moving
 
                 if (!current.isAtEnd()) {
                     int teleported = teleportRule.applyRule(current.getPosition());
@@ -76,7 +78,7 @@ public class Game {
                         current.setPosition(teleported);
                     }
                 }
-
+                // Check if the current player has won
                 if (current.isAtEnd()) {
                     output.printLine(current.getName() + " wins in " + turnCounts[i] + " turns. Total turns: " + totalTurns + ".");
                     output.printLine("Game State: InPlay -> GameOver");

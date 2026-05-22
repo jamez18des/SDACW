@@ -19,8 +19,10 @@ import java.util.List;
 
 @Component
 public class GameRunner {
+    // Boustrophedon player tracks for 5x5 board
     private static final int[] RED_SMALL   = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};
     private static final int[] BLUE_SMALL  = {25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1};
+    // Boustrophedon player tracks for 6x6 board
     private static final int[] RED_LARGE   = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36};
     private static final int[] BLUE_LARGE  = {31,32,33,34,35,36,25,26,27,28,29,30,19,20,21,22,23,24,13,14,15,16,17,18,7,8,9,10,11,12,1,2,3,4,5,6};
     private static final int[] YELLOW_LARGE = {36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1};
@@ -30,7 +32,7 @@ public class GameRunner {
     private static final Board LARGE_BOARD = new Board(6, 6);
 
     private final GameOutputPort output;
-
+    // Spring Boot injects ConsoleGameOutput via GameOutputPort interface
     public GameRunner(GameOutputPort output) {
         this.output = output;
     }
